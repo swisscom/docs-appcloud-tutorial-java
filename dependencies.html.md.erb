@@ -1,0 +1,66 @@
+---
+title: Declare App Dependencies
+owner: Daniel Freitag
+---
+
+<strong><%= modified_date %></strong>
+
+<%= vars.product_short %> uses the Java buildpack to execute the uploaded JAR file as application package. The Java buildpack will run your application using the `main()` method from the `core.clj` file.
+
+The dependencies needed for the application are declared in the `build.gradle` file and are included in the standalone JAR. 
+
+The `build.gradle` file of your deployed sample app looks as follows:
+
+
+```
+apply plugin: 'java'
+...
+
+sourceCompatibility = 1.8
+version = '1.0'
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'CF Java Sample App',  
+        	'Implementation-Version': version,
+        	'Main-Class': 'com.swisscom.cloud.cloudfoundry.sampleapp.java.ProductService'
+    }
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.sparkjava:spark-core:2.2'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
+	  compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.2'	
+   	testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+}
+
+...
+```
+
+The `build.gradle` file declares both the version of Java that will be used to run your application on <%= vars.product_short %>, as well as the dependencies that should be installed with your application.
+
+To install the required dependencies, simply compile/build your application with:
+
+<pre class="terminal">
+$ gradle build
+2016-04-05 09:41:09.060:INFO::main: Logging initialized @3611ms
+Compiling cf-sample-app-clojure.core
+Created /.../cf-sample-app-clojure/target/cf-sample-app-clojure-0.1.0-SNAPSHOT.jar
+Created /.../cf-sample-app-clojure/target/cf-sample-app-clojure-0.1.0-SNAPSHOT-standalone.jar
+</pre>
+
+<div style="text-align:center;margin:3em;">
+  <a href="./run-locally.html" class="btn btn-primary">I've installed the App dependencies locally</a>
+</div>
+Status API Training Shop Blog About
+© 2016 GitHub, Inc. Terms Priva
