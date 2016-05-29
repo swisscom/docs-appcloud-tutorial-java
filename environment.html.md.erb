@@ -5,13 +5,13 @@ owner: Daniel Freitag
 
 <strong><%= modified_date %></strong>
 
-<%= vars.product_short %> lets you externalize configuration - storing environment variables and application properties in <a href="../devguide/deploy-apps/environment-variable.html" target="_blank">environment variables</a>.
+<%= vars.product_short %> lets you externalize configuration - storing application properties in <a href="../devguide/deploy-apps/environment-variable.html" target="_blank">environment variables</a>.
 
 At runtime, environment variables are exposed to the application through its environment. You can use this for example to run your app in production mode setting the APP_MODE environment variable.
 
 <pre class="terminal">
-$ cf set-env my-python-app APP_MODE production
-Setting env variable 'APP_MODE' to 'production' for app my-python-app in org MyOrg / space MySpace as user@smydomain.com...
+$ cf set-env my-java-app APP_MODE production
+Setting env variable 'APP_MODE' to 'production' for app my-java-app in org MyOrg / space MySpace as user@smydomain.com...
 OK
 TIP: Use 'cf restage' to ensure your env variable changes take effect
 </pre>
