@@ -53,10 +53,24 @@ To install the required dependencies, simply compile/build your application with
 
 <pre class="terminal">
 $ gradle build
-2016-04-05 09:41:09.060:INFO::main: Logging initialized @3611ms
-Compiling cf-sample-app-clojure.core
-Created /.../cf-sample-app-clojure/target/cf-sample-app-clojure-0.1.0-SNAPSHOT.jar
-Created /.../cf-sample-app-clojure/target/cf-sample-app-clojure-0.1.0-SNAPSHOT-standalone.jar
+
+...
+
+:compileJava
+:processResources UP-TO-DATE
+:classes
+:jar
+:assemble
+:compileTestJava UP-TO-DATE
+:processTestResources UP-TO-DATE
+:testClasses UP-TO-DATE
+:test UP-TO-DATE
+:check UP-TO-DATE
+:build
+
+BUILD SUCCESSFUL
+
+Total time: 6.78 secs
 </pre>
 
 <div style="text-align:center;margin:3em;">
