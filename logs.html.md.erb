@@ -13,8 +13,12 @@ View information about your running app using one of the logging commands, `cf l
 $ cf logs my-java-app
 Connected, tailing logs for app my-java-app in org MyOrg / space MySpace as user@mydomain.com...
 
-2016-03-30T16:37:06.39+0200 [App/0]      OUT GET / 200 1.756 ms - 212
-2016-03-30T16:37:06.39+0200 [RTR/1]      OUT my-random-hostname.scapp.io - [30/03/2016:14:37:06 +0000] "GET / HTTP/1.1" 200 0 212 "-" "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36" 195.65.130.2:61671 x_forwarded_for:"-" x_forwarded_proto:"http" vcap_request_id:f1ac25ce-2ca5-4538-59c5-83d58de55766 response_time:0.005294073 app_id:c98d5025-1bc9-46aa-8bba-51f55f7f2599
+2016-05-29T15:58:44.80+0200 [RTR/0]      OUT cf-sample-app-java.scapp.io - [29/05/2016:13:58:44 +0000] "GET / HTTP/1.1" 200 0 83 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, lik
+e Gecko) Chrome/50.0.2661.102 Safari/537.36" 85.4.61.216:58977 x_forwarded_for:"-" x_forwarded_proto:"http" vcap_request_id:7d4a0666-baa2-4513-44fa-54adea9fc874 response_time:0.172195463 app_id:a83336
+14-5870-484b-b57b-a84bac0666f6
+2016-05-29T15:58:46.08+0200 [RTR/0]      OUT cf-sample-app-java.scapp.io - [29/05/2016:13:58:46 +0000] "GET / HTTP/1.1" 200 0 83 "-" "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, lik
+e Gecko) Chrome/50.0.2661.102 Safari/537.36" 85.4.61.216:58977 x_forwarded_for:"-" x_forwarded_proto:"http" vcap_request_id:3470b5dd-8f98-441d-5e4a-1c68e0964844 response_time:0.00505579 app_id:a833361
+4-5870-484b-b57b-a84bac0666f6
 </pre>
 
 Visit your application in the browser, to see log messages being generated.
