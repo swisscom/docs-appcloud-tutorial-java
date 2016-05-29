@@ -1,0 +1,36 @@
+---
+title: Define Environment Variables
+owner: Daniel Freitag
+---
+
+<strong><%= modified_date %></strong>
+
+<%= vars.product_short %> lets you externalize configuration - storing environment variables and application properties in <a href="../devguide/deploy-apps/environment-variable.html" target="_blank">environment variables</a>.
+
+At runtime, environment variables are exposed to the application through its environment. You can use this for example to run your app in production mode setting the APP_MODE environment variable.
+
+<pre class="terminal">
+$ cf set-env my-python-app APP_MODE production
+Setting env variable 'APP_MODE' to 'production' for app my-python-app in org MyOrg / space MySpace as user@smydomain.com...
+OK
+TIP: Use 'cf restage' to ensure your env variable changes take effect
+</pre>
+
+Then restage your app as suggested using
+
+<pre class="terminal">
+$ cf restage my-java-app
+Restaging app my-java-app in org MyOrg / space MySpace as user@mydomain.com...
+-----> Downloaded app package (3M)
+
+...
+</pre>
+
+All environment variables can be accessed using `System.getenv().get('ENV_VARIABLE')` or `new ProcessBuilder().environment().get("ENV_VARIABLE")` from within your Java app. 
+
+<div style="text-align:center;margin:3em;">
+  <a href="./bind-service.html" class="btn btn-primary">I've set my environment variable</a>
+</div>
+
+Status API Training Shop Blog About
+© 2016 GitHub, Inc. 
