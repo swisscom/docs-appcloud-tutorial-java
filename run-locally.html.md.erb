@@ -8,11 +8,13 @@ owner: Daniel Freitag
 Once the application is compiled and built with all dependencies, you will be ready to run your app locally using the command
 
 <pre class="terminal">
-$ java -jar cf-sample-app-java-1.0.jar
+$ java -jar build/libs/cf-sample-app-java-1.0.jar
 
 ...
-
-2016-04-12 22:59:11.179:INFO:oejs.Server:main Started @2834ms
+[Thread-0] INFO spark.webserver.SparkServer - == Spark has ignited ...
+[Thread-0] INFO spark.webserver.SparkServer - >> Listening on 0.0.0.0:4567
+[Thread-0] INFO org.eclipse.jetty.server.Server - jetty-9.0.z-SNAPSHOT
+[Thread-0] INFO org.eclipse.jetty.server.ServerConnector - Started ServerConnector@2b338a85{HTTP/1.1}{0.0.0.0:4567}
 </pre>
 
 Open <a href="http://localhost:4567" target="_blank">http://localhost:4567</a> with your web browser. You should see your app running locally.
