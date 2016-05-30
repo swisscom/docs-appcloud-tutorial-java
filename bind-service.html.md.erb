@@ -1,0 +1,220 @@
+---
+title: Bind a Service to Your App
+owner: Daniel Freitag
+---
+
+<strong><%= modified_date %></strong>
+
+The <a href="../service-offerings/index.html" target="_blank">service marketplace</a> has a large number of data stores, from Redis and MongoDB, to MariaDB (fork of MySQL) and RabbitMQ. You can run `cf marketplace` to get an overview. In this step you will add a small Redis datastore to your app.
+
+Create the Redis datastore:
+
+<pre class="terminal">
+$ cf create-service redis small my-redis-service
+Creating service instance my-redis-service in org MyOrg / space MySpace as user@mydomain.com...
+OK
+
+Create in progress. Use 'cf services' or 'cf service my-redis-service' to check operation status.
+
+Attention: The plan `small` of service `redis` is not free.  The instance `my-redis-service` will incur a cost.  Contact your administrator if you think this is in error.
+</pre>
+
+This creates a small Redis datastore for you which we now have to bind to our application. Binding means that the credentials and URL of the service will be written dynamically into the environment variables of the app as `VCAP_SERVICES` and can hence be used directly from there.
+
+Let's bind the new service to our existing application:
+
+<pre class="terminal">
+$ cf bind-service my-java-app my-redis-service
+Binding service my-redis-service to app my-java-app in org MyOrg / space MySpace as user@mydomain.com...
+OK
+TIP: Use 'cf restage my-java-app' to ensure your env variable changes take effect
+</pre>
+
+<p class="note">
+  <strong>Note</strong>: If you are getting <code>Server error, status code: 409</code>, please try again after a couple of minutes. It takes a while to spin up that Redis datastore for you.
+</p>
+
+The credentials and URL of the bound service are available in the environment variables of your app. List the environment variables of your app:
+
+<pre class="terminal">
+$ cf env my-java-app
+
+System-Provided:
+{
+ "VCAP_SERVICES": {
+  "redis": [
+   {
+    "credentials": {
+     "host": "cbkc81454gjrxxxx.service.consul",
+     "password": "RxxkJ75jKTDqxxxx",
+     "port": 59282
+    },
+    "label": "redis",
+    "name": "my-redis-service",
+    "plan": "small",
+    "provider": null,
+    "syslog_drain_url": null,
+    "tags": []
+   }
+  ]
+ }
+}
+
+...
+</pre>
+
+After that you have to restage the application as suggested so that it includes the new credentials in its environment variables:
+
+<pre class="terminal">
+$ cf restage my-java-app
+Restaging app my-java-app in MyOrg monitor / space MySpace as user@mydomain.com...
+-----> Downloaded app buildpack cache (3M)
+-----> Java Buildpack Version: v3.6 (offline) | https://github.com/cloudfoundry/java-buildpack.git#5194155
+-----> Downloading Open Jdk JRE 1.8.0_71 from https://download.run.pivotal.io/openjdk/trusty/x86_64/openjdk-1.8.0_71.tar.gz (found in cache)
+...
+</pre>
+
+Now we want to consume our new Redis datastore from within our application. In order to do that, you have to adjust the existing `ProductRepository` to store and retrieve products via Redis datastore. But first you have to add following dependency <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> to the `build.gradle` file:
+
+```
+compile 'redis.clients:jedis:2.6.2'
+```
+
+The `build.gradle` file should look as follows:
+
+```
+apply plugin: 'java'
+...
+
+sourceCompatibility = 1.8
+version = '1.0'
+
+jar {
+    manifest {
+        attributes 'Implementation-Title': 'CF Java Sample App',  
+        	'Implementation-Version': version,
+        	'Main-Class': 'com.swisscom.cloud.cloudfoundry.sampleapp.java.ProductService'
+    }
+    from {
+        (configurations.runtime).collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'com.sparkjava:spark-core:2.2'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
+    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.2'	
+    compile 'redis.clients:jedis:2.6.2'
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+}
+
+...
+```
+
+Now adjust the existing `ProductService` to setup a Redis-based `ProductRepository`:
+
+```
+private static ProductRepository getProductRepository() {
+  	Map<String,Object> redisCredentials = getRedisCredentials();
+  	return new ProductRepository(redisCredentials);
+}
+```
+
+```
+@SuppressWarnings("unchecked")
+private static Map<String,Object> getRedisCredentials() {
+        
+	  ProcessBuilder processBuilder = new ProcessBuilder();
+    String servicesJson = processBuilder.environment().get("VCAP_SERVICES");
+       
+    ObjectMapper mapper = new ObjectMapper();
+    if (servicesJson != null) {
+      	try {
+		    		Map<String,Object> services = mapper.readValue(servicesJson, new TypeReference<Map<String,Object>>() { });
+				    List<Map<String,Object>> redisServices = (List<Map<String, Object>>) services.get("redis");
+				    for (Map<String,Object> redisService : redisServices) {
+					      // It is assumed that only one Redis service is bound to this app. Evaluate the name property 
+					      // of the credentials in case multiple Redis services are bound to an app
+					      return (Map<String, Object>) redisService.get("credentials");						
+				    }
+        } catch (Exception exception) {
+				    throw new RuntimeException("Redis service declaration not found", exception);
+			  }
+    }
+		throw new RuntimeException("Redis service declaration not found");
+}
+```
+
+Note that you have to read the credentials of your Redis service from the environment variables of your app in order to setup your `ProductRepository`.
+
+Now adjust the existing `ProductRepository` to store and retrieve products via Redis datastore:
+
+
+```
+public class ProductRepository {
+    	
+  	private Jedis jedis;
+  	private ObjectMapper mapper;
+    	
+  	public ProductRepository(Map<String,Object> redisCredentials) {
+    		jedis = new Jedis((String) redisCredentials.get("host"), (int) redisCredentials.get("port"));
+    		jedis.auth((String) redisCredentials.get("password"));
+    		mapper = new ObjectMapper();
+  	}
+    	   	
+  	public long add(Product product) {
+    		product.setId(nextId());
+    		jedis.rpush("products", mapToJson(product));
+    		return product.getId();
+  	}
+    	
+  	public Collection<Product> findAll() {
+    		return jedis.lrange("products", 0, jedis.llen("products")).stream()
+    			.map(productJson -> mapToProduct(productJson))
+    			.collect(Collectors.toList());
+  	}
+    	
+  	private Long nextId() {
+    		return jedis.incr("productid");
+  	}
+    	
+  	private String mapToJson(Product product) {
+    		try {
+	  		  	return mapper.writeValueAsString(product);
+ 			  } catch (JsonProcessingException e) {
+ 			    	throw new RuntimeException("Product cannot be serialized as JSON");
+    		}
+    }
+    	
+    private Product mapToProduct(String productJson) {
+    		try {
+		    		return mapper.readValue(productJson, Product.class);
+			  } catch (IOException exception) {
+				    throw new RuntimeException("Product cannot be deserialized from JSON");
+			  }
+    }
+}
+```
+
+With this latest code you can still experiment locally, since a simple default `ProductRepository` is setup in case the CloudFoundry credentials don't exist. This allows you to run your app locally as well as in the cloud without having to configure anything differently. However, you must install Redis on your local machine, if you want to test your app with a local Redis datastore. So let's push it to the cloud after recompiling:
+
+<pre class="terminal">
+$ gralde build
+$ cf push my-java-app -b java_buildpack -p build/libs/cf-sample-app-java-1.0.jar
+</pre>
+
+You can access other services like MongoDB or MariaDB in a similar matter, simply by binding them to your app and accessing them through the environment variables.
+
+You can checkout the finished version of all these changes in the `advanced` branch of the sample app repository, at: https://github.com/swisscom/cf-sample-app-java/tree/advanced
+
+<div style="text-align:center;padding:3em;">
+  <a href="./manifest.html" class="btn btn-primary">I've bound a service to my App</a>
+</div>
