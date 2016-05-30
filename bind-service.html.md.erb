@@ -155,11 +155,11 @@ private static Map<String,Object> getRedisCredentials() {
 
 Note that you have to read the credentials of your Redis service from the environment variables of your app in order to setup your `ProductRepository`.
 
-Now adjust the existing `ProductRepository` to store and retrieve products via Redis datastore:
+Now adjust the existing `ProductRepository` (a static inner class of `ProductServce`) to store and retrieve products via Redis datastore:
 
 
 ```
-public class ProductRepository {
+public static class ProductRepository {
     	
   	private Jedis jedis;
   	private ObjectMapper mapper;
