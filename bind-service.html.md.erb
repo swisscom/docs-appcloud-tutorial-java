@@ -19,9 +19,9 @@ Create in progress. Use 'cf services' or 'cf service my-redis-service' to check 
 Attention: The plan `small` of service `redis` is not free.  The instance `my-redis-service` will incur a cost.  Contact your administrator if you think this is in error.
 </pre>
 
-This creates a small Redis datastore for you which we now have to bind to our application. Binding means that the credentials and URL of the service will be written dynamically into the environment variables of the app as `VCAP_SERVICES` and can hence be used directly from there.
+This creates a small Redis datastore for you which you now have to bind to your application. Binding means that the credentials and URL of the service will be written dynamically into the environment variables of the app as `VCAP_SERVICES` and can hence be used directly from there.
 
-Let's bind the new service to our existing application:
+Now bind the new service to your existing application:
 
 <pre class="terminal">
 $ cf bind-service my-java-app my-redis-service
@@ -34,7 +34,7 @@ TIP: Use 'cf restage my-java-app' to ensure your env variable changes take effec
   <strong>Note</strong>: If you are getting <code>Server error, status code: 409</code>, please try again after a couple of minutes. It takes a while to spin up that Redis datastore for you.
 </p>
 
-The credentials and URL of the bound service are available in the environment variables of your app. List the environment variables of your app:
+The credentials and URL of the bound service are available in the environment variables of your app. You can list the environment variables of your app as follows:
 
 <pre class="terminal">
 $ cf env my-java-app
@@ -74,7 +74,7 @@ Restaging app my-java-app in MyOrg monitor / space MySpace as user@mydomain.com.
 ...
 </pre>
 
-Now we want to consume our new Redis datastore from within our application. In order to do that, you have to adjust the existing `ProductRepository` to store and retrieve products via Redis datastore. But first you have to add following dependency <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> to the `build.gradle` file:
+Now you want to consume your new Redis datastore from within your application. In order to do that, you have to adjust the code to store and retrieve data via Redis datastore. But first you have to add following dependency <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> to the `build.gradle` file:
 
 ```
 compile 'redis.clients:jedis:2.6.2'
