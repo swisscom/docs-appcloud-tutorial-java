@@ -137,22 +137,21 @@ private static ProductRepository getProductRepository() {
 ```
 @SuppressWarnings("unchecked")
 private static Map<String,Object> getRedisCredentials(String servicesJson) {
-    
-    ObjectMapper mapper = new ObjectMapper();
-    if (servicesJson != null) {
-        try {
-	    	Map<String,Object> services = mapper.readValue(servicesJson, new TypeReference<Map<String,Object>>() { });
-	  	List<Map<String,Object>> redisServices = (List<Map<String, Object>>) services.get("redis");
-	    	for (Map<String,Object> redisService : redisServices) {
-	        	// It is assumed that only one Redis service is bound to this app. Evaluate the name property 
-			// of the credentials in case multiple Redis services are bound to an app
-			return (Map<String, Object>) redisService.get("credentials");						
-	    	}
-        } catch (Exception exception) {
-	   	throw new RuntimeException("Redis service declaration not found", exception);
-	}
-    }
-    throw new RuntimeException("Redis service declaration not found");
+   	ObjectMapper mapper = new ObjectMapper();
+    	if (servicesJson != null) {
+        	try {
+	    		Map<String,Object> services = mapper.readValue(servicesJson, new TypeReference<Map<String,Object>>() { });
+	  		List<Map<String,Object>> redisServices = (List<Map<String, Object>>) services.get("redis");
+	    		for (Map<String,Object> redisService : redisServices) {
+	        		// It is assumed that only one Redis service is bound to this app. Evaluate the name property 
+				// of the credentials in case multiple Redis services are bound to an app
+				return (Map<String, Object>) redisService.get("credentials");						
+	    		}
+        	} catch (Exception exception) {
+	   		throw new RuntimeException("Redis service declaration not found", exception);
+		}
+	 }
+	 throw new RuntimeException("Redis service declaration not found");
 }
 ```
 
