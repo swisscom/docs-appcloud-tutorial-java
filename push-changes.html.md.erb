@@ -7,7 +7,7 @@ owner: Daniel Freitag
 
 In this step you’ll learn how to propagate a local change to the application through to <%= vars.product_short %>. As a simple change, we'll modify the version returned when accessing the root endpoint `/`.
 
-To do this, change the version in the static INFO variable in the `src/main/java/.../ProductService.class` file'. 
+To do this, change the version in the static INFO variable in the `src/main/java/.../ProductService.class` file'.
 
 Now compile/build and test locally:
 
@@ -19,20 +19,20 @@ $ gradle build
 $ java -jar target/build/libs/cf-sample-app-java-1.0.jar
 </pre>
 
-Visiting your application at <a href="http://localhost:4567" target="_blank">http://localhost:4567</a>, you should retrieve following response:
+Visiting your application at <a href="http://localhost:4567" target="_blank">http://localhost:4567</a>, you should receive the following response:
 
-<pre>
+```json
 {
-    "status": "Your Java sample app is up and running !",
-    "version": "1.0.01",
-    "appMode": null
+  "status": "Your Java sample app is up and running !",
+  "version": "1.0.01",
+  "appMode": null
 }
-</pre>
+```
 
 Since you already have compiled and built your latest changes, you only need to push your changes to the app cloud. All you need to do is to execute `cf push` again:
 
 <pre class="terminal">
-$ cf push my-java-app -b java_buildpack -p target/build/libs/cf-sample-app-java-1.0.jar
+$ cf push my-java-app -p target/build/libs/cf-sample-app-java-1.0.jar
 </pre>
 
 Finally, check that everything is working by visiting your app's URL from your web browser.
