@@ -123,21 +123,24 @@ Now adjust the existing `ProductService` to setup a Redis-based `ProductReposito
 
 ```
 private static ProductRepository getProductRepository() {
-  	Map<String,Object> redisCredentials = getRedisCredentials();
-  	return new ProductRepository(redisCredentials);
+    	ProcessBuilder processBuilder = new ProcessBuilder();
+        String servicesJson = processBuilder.environment().get("VCAP_SERVICES");        
+        if (servicesJson != null) {
+    	    	Map<String,Object> redisCredentials = getRedisCredentials(servicesJson);
+           	return new RedisProductRepository(redisCredentials);
+        } else {
+        	return new SimpleProductRepository();
+        }
 }
 ```
 
 ```
 @SuppressWarnings("unchecked")
-private static Map<String,Object> getRedisCredentials() {
+private static Map<String,Object> getRedisCredentials(String servicesJson) {
     
-    	ProcessBuilder processBuilder = new ProcessBuilder();
-    	String servicesJson = processBuilder.environment().get("VCAP_SERVICES");
-       
-    	ObjectMapper mapper = new ObjectMapper();
-    	if (servicesJson != null) {
-      	    try {
+    ObjectMapper mapper = new ObjectMapper();
+    if (servicesJson != null) {
+        try {
 	    	Map<String,Object> services = mapper.readValue(servicesJson, new TypeReference<Map<String,Object>>() { });
 	  	List<Map<String,Object>> redisServices = (List<Map<String, Object>>) services.get("redis");
 	    	for (Map<String,Object> redisService : redisServices) {
@@ -145,11 +148,11 @@ private static Map<String,Object> getRedisCredentials() {
 			// of the credentials in case multiple Redis services are bound to an app
 			return (Map<String, Object>) redisService.get("credentials");						
 	    	}
-            } catch (Exception exception) {
-	    	throw new RuntimeException("Redis service declaration not found", exception);
-	    }
-    	}
-    	throw new RuntimeException("Redis service declaration not found");
+        } catch (Exception exception) {
+	   	throw new RuntimeException("Redis service declaration not found", exception);
+	}
+    }
+    throw new RuntimeException("Redis service declaration not found");
 }
 ```
 
