@@ -10,13 +10,13 @@ The <a href="../service-offerings/index.html" target="_blank">service marketplac
 Create the Redis datastore:
 
 <pre class="terminal">
-$ cf create-service redis small my-redis-service
-Creating service instance my-redis-service in org MyOrg / space MySpace as user@mydomain.com...
+$ cf create-service redis small my-redis
+Creating service instance my-redis in org MyOrg / space MySpace as user@mydomain.com...
 OK
 
-Create in progress. Use 'cf services' or 'cf service my-redis-service' to check operation status.
+Create in progress. Use 'cf services' or 'cf service my-redis' to check operation status.
 
-Attention: The plan `small` of service `redis` is not free.  The instance `my-redis-service` will incur a cost.  Contact your administrator if you think this is in error.
+Attention: The plan `small` of service `redis` is not free.  The instance `my-redis` will incur a cost.  Contact your administrator if you think this is in error.
 </pre>
 
 This creates a small Redis datastore for you which you now have to bind to your application. Binding means that the credentials and URL of the service will be written dynamically into the environment variables of the app as `VCAP_SERVICES` and can hence be used directly from there.
@@ -24,8 +24,8 @@ This creates a small Redis datastore for you which you now have to bind to your 
 Now bind the new service to your existing application:
 
 <pre class="terminal">
-$ cf bind-service my-java-app my-redis-service
-Binding service my-redis-service to app my-java-app in org MyOrg / space MySpace as user@mydomain.com...
+$ cf bind-service my-java-app my-redis
+Binding service my-redis to app my-java-app in org MyOrg / space MySpace as user@mydomain.com...
 OK
 TIP: Use 'cf restage my-java-app' to ensure your env variable changes take effect
 </pre>
@@ -50,7 +50,7 @@ System-Provided:
      "port": 59282
     },
     "label": "redis",
-    "name": "my-redis-service",
+    "name": "my-redis",
     "plan": "small",
     "provider": null,
     "syslog_drain_url": null,
@@ -74,150 +74,111 @@ Restaging app my-java-app in MyOrg monitor / space MySpace as user@mydomain.com.
 ...
 </pre>
 
-Now you want to consume your new Redis datastore from within your application. In order to do that, you have to adjust the code to store and retrieve data via Redis datastore. But first you have to add following <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> dependency to the `build.gradle` file. Jedis is a Java Redis client that lets your app interact with the Redis server.
+Now you want to consume your new Redis datastore from within your application. In order to do that, you have to adjust the code to store and retrieve data via Redis. But first you have to add the <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> dependency to the "dependencies" section of your `build.gradle` file. Jedis is a Java Redis client that lets your app interact with the Redis server.
 
-```
+```java
 compile 'redis.clients:jedis:2.6.2'
 ```
 
-The `build.gradle` file should look as follows:
+Now adjust the existing `ProductService` in `src/main/.../ProductService.java` to setup a Redis-based `ProductRepository`:
 
-```
-apply plugin: 'java'
-...
-
-sourceCompatibility = 1.8
-version = '1.0'
-
-jar {
-    manifest {
-        attributes 'Implementation-Title': 'CF Java Sample App',  
-        	'Implementation-Version': version,
-        	'Main-Class': 'com.swisscom.cloud.cloudfoundry.sampleapp.java.ProductService'
-    }
-    from {
-        (configurations.runtime).collect {
-            it.isDirectory() ? it : zipTree(it)
-        }
-    }
-    exclude 'META-INF/*.RSA', 'META-INF/*.SF','META-INF/*.DSA'
-}
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-    compile 'com.sparkjava:spark-core:2.2'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
-    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.2'	
-    compile 'redis.clients:jedis:2.6.2'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
-}
-
-...
-```
-
-Now adjust the existing `ProductService` to setup a Redis-based `ProductRepository`:
-
-```
+```java
 private static ProductRepository getProductRepository() {
-    	ProcessBuilder processBuilder = new ProcessBuilder();
-        String servicesJson = processBuilder.environment().get("VCAP_SERVICES");        
-        if (servicesJson != null) {
-    	    	Map<String,Object> redisCredentials = getRedisCredentials(servicesJson);
-           	return new RedisProductRepository(redisCredentials);
-        } else {
-        	return new SimpleProductRepository();
-        }
+	ProcessBuilder processBuilder = new ProcessBuilder();
+    String servicesJson = processBuilder.environment().get("VCAP_SERVICES");
+    if (servicesJson != null) {
+    	Map<String,Object> redisCredentials = getRedisCredentials(servicesJson);
+     	return new RedisProductRepository(redisCredentials);
+    } else {
+    	return new SimpleProductRepository();
+    }
 }
 ```
 
-```
+```java
 @SuppressWarnings("unchecked")
 private static Map<String,Object> getRedisCredentials(String servicesJson) {
-	ObjectMapper mapper = new ObjectMapper();
-    	if (servicesJson != null) {
-        	try {
-	    		Map<String,Object> services = mapper.readValue(servicesJson, new TypeReference<Map<String,Object>>() { });
-	  		List<Map<String,Object>> redisServices = (List<Map<String, Object>>) services.get("redis");
-	    		for (Map<String,Object> redisService : redisServices) {
-	        		// It is assumed that only one Redis service is bound to this app. Evaluate the name property 
-				// of the credentials in case multiple Redis services are bound to an app
-				return (Map<String, Object>) redisService.get("credentials");						
-	    		}
-        	} catch (Exception exception) {
-	   		throw new RuntimeException("Redis service declaration not found", exception);
-		}
-	 }
-	 throw new RuntimeException("Redis service declaration not found");
+  ObjectMapper mapper = new ObjectMapper();
+    if (servicesJson != null) {
+      try {
+        Map<String,Object> services = mapper.readValue(servicesJson, new TypeReference<Map<String,Object>>() { });
+        List<Map<String,Object>> redisServices = (List<Map<String, Object>>) services.get("redis");
+        for (Map<String,Object> redisService : redisServices) {
+          // It is assumed that only one Redis service is bound to this app. Evaluate the name property
+          // of the credentials in case multiple Redis services are bound to an app
+          return (Map<String, Object>) redisService.get("credentials");
+        }
+      } catch (Exception exception) {
+        throw new RuntimeException("Redis service declaration not found", exception);
+      }
+   }
+   throw new RuntimeException("Redis service declaration not found");
 }
 ```
 
-Thd code snippet above ensures that your app reads the credentials of your Redis service from the environment variables in order to setup the `ProductRepository`.
+The code snippet above ensures that your app reads the credentials of your Redis service from the environment variables in order to setup the `ProductRepository`.
 
 Now adjust the existing `ProductRepository` (a static inner class of `ProductServce`) to store and retrieve products via Redis datastore:
 
-
-```
+```java
 public static class ProductRepository {
-    	
-  	private Jedis jedis;
-  	private ObjectMapper mapper;
-    	
-  	public ProductRepository(Map<String,Object> redisCredentials) {
-    		jedis = new Jedis((String) redisCredentials.get("host"), (int) redisCredentials.get("port"));
-    		jedis.auth((String) redisCredentials.get("password"));
-    		mapper = new ObjectMapper();
-  	}
-    	   	
-  	public long add(Product product) {
-    		product.setId(nextId());
-    		jedis.rpush("products", mapToJson(product));
-    		return product.getId();
-  	}
-    	
-  	public Collection<Product> findAll() {
-    		return jedis.lrange("products", 0, jedis.llen("products")).stream()
-    			.map(productJson -> mapToProduct(productJson))
-    			.collect(Collectors.toList());
-  	}
-    	
-  	private Long nextId() {
-    		return jedis.incr("productid");
-  	}
-    	
-  	private String mapToJson(Product product) {
-    		try {
-	  		return mapper.writeValueAsString(product);
- 		} catch (JsonProcessingException e) {
- 		    	throw new RuntimeException("Product cannot be serialized as JSON");
-    		}
-    	}
-    	
-    	private Product mapToProduct(String productJson) {
-    		try {
-			return mapper.readValue(productJson, Product.class);
-		} catch (IOException exception) {
-			throw new RuntimeException("Product cannot be deserialized from JSON");
-		}
-    	}
+
+  private Jedis jedis;
+  private ObjectMapper mapper;
+
+  public ProductRepository(Map<String,Object> redisCredentials) {
+    jedis = new Jedis((String) redisCredentials.get("host"), (int) redisCredentials.get("port"));
+    jedis.auth((String) redisCredentials.get("password"));
+    mapper = new ObjectMapper();
+  }
+
+  public long add(Product product) {
+    product.setId(nextId());
+    jedis.rpush("products", mapToJson(product));
+    return product.getId();
+  }
+
+  public Collection<Product> findAll() {
+    return jedis.lrange("products", 0, jedis.llen("products")).stream()
+      .map(productJson -> mapToProduct(productJson))
+      .collect(Collectors.toList());
+  }
+
+  private Long nextId() {
+    return jedis.incr("productid");
+  }
+
+  private String mapToJson(Product product) {
+    try {
+      return mapper.writeValueAsString(product);
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Product cannot be serialized as JSON");
+    }
+  }
+
+  private Product mapToProduct(String productJson) {
+    try {
+      return mapper.readValue(productJson, Product.class);
+    } catch (IOException exception) {
+      throw new RuntimeException("Product cannot be deserialized from JSON");
+    }
+  }
+
 }
 ```
 
-With this latest code you can still experiment locally, since your app uses a simple default `ProductRepository` instead of the Redis-based repository in case your Redis service binding cannot be found. This allows you to run your app locally as well as in the cloud without having to configure anything differently. However, you must install Redis on your local machine, if you want to test your app with a local Redis server. 
+With this latest code you can still experiment locally, since your app uses a simple default `ProductRepository` instead of the Redis-based repository in case your Redis service binding cannot be found. This allows you to run your app locally as well as in the cloud without having to configure anything differently. However, you must install <a href="http://redis.io/topics/quickstart" target="_blank">Redis</a> on your local machine, if you want to test your app with a local Redis server.
 
 Now compile/build your changes and push them to the cloud:
 
 <pre class="terminal">
-$ gralde build
-$ cf push my-java-app -b java_buildpack -p target/build/libs/cf-sample-app-java-1.0.jar
+$ gradle build
+$ cf push my-java-app -p target/build/libs/cf-sample-app-java-1.0.jar
 </pre>
 
 You can access other services like MongoDB or MariaDB in a similar matter, simply by binding them to your app and accessing them through the environment variables.
 
-You can checkout the finished version of all these changes in the `advanced` branch of the sample app repository, at: https://github.com/swisscom/cf-sample-app-java/tree/advanced
+You can checkout the finished version of all these changes in the `advanced` branch of the sample app repository on <a href="https://github.com/swisscom/cf-sample-app-java/tree/advanced" target="_blank">Github</a>.
 
 <div style="text-align:center;padding:3em;">
   <a href="./manifest.html" class="btn btn-primary">I've bound a service to my App</a>
