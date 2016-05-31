@@ -137,7 +137,7 @@ private static ProductRepository getProductRepository() {
 ```
 @SuppressWarnings("unchecked")
 private static Map<String,Object> getRedisCredentials(String servicesJson) {
-   	ObjectMapper mapper = new ObjectMapper();
+	ObjectMapper mapper = new ObjectMapper();
     	if (servicesJson != null) {
         	try {
 	    		Map<String,Object> services = mapper.readValue(servicesJson, new TypeReference<Map<String,Object>>() { });
