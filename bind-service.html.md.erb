@@ -74,7 +74,7 @@ Restaging app my-java-app in MyOrg monitor / space MySpace as user@mydomain.com.
 ...
 </pre>
 
-Now you want to consume your new Redis datastore from within your application. In order to do that, you have to adjust the code to store and retrieve data via Redis datastore. But first you have to add following <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> dependency to the `build.gradle` file:
+Now you want to consume your new Redis datastore from within your application. In order to do that, you have to adjust the code to store and retrieve data via Redis datastore. But first you have to add following <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> dependency to the `build.gradle` file. Jedis is a Java Redis client that lets your app interact with the Redis server.
 
 ```
 compile 'redis.clients:jedis:2.6.2'
@@ -137,23 +137,23 @@ private static Map<String,Object> getRedisCredentials() {
        
     	ObjectMapper mapper = new ObjectMapper();
     	if (servicesJson != null) {
-      		try {
-	    		Map<String,Object> services = mapper.readValue(servicesJson, new TypeReference<Map<String,Object>>() { });
-			List<Map<String,Object>> redisServices = (List<Map<String, Object>>) services.get("redis");
-	    		for (Map<String,Object> redisService : redisServices) {
-	        		// It is assumed that only one Redis service is bound to this app. Evaluate the name property 
-				// of the credentials in case multiple Redis services are bound to an app
-				return (Map<String, Object>) redisService.get("credentials");						
-	    		}
-        	} catch (Exception exception) {
-	    		throw new RuntimeException("Redis service declaration not found", exception);
-		}
+      	    try {
+	    	Map<String,Object> services = mapper.readValue(servicesJson, new TypeReference<Map<String,Object>>() { });
+	  	List<Map<String,Object>> redisServices = (List<Map<String, Object>>) services.get("redis");
+	    	for (Map<String,Object> redisService : redisServices) {
+	        	// It is assumed that only one Redis service is bound to this app. Evaluate the name property 
+			// of the credentials in case multiple Redis services are bound to an app
+			return (Map<String, Object>) redisService.get("credentials");						
+	    	}
+            } catch (Exception exception) {
+	    	throw new RuntimeException("Redis service declaration not found", exception);
+	    }
     	}
     	throw new RuntimeException("Redis service declaration not found");
 }
 ```
 
-This last snippet of code ensures that your app reads the credentials of your Redis service from the environment variables in order to setup the `ProductRepository`.
+Thd code snippet above ensures that your app reads the credentials of your Redis service from the environment variables in order to setup the `ProductRepository`.
 
 Now adjust the existing `ProductRepository` (a static inner class of `ProductServce`) to store and retrieve products via Redis datastore:
 
@@ -204,7 +204,7 @@ public static class ProductRepository {
 }
 ```
 
-With this latest code you can still experiment locally, since a simple default `ProductRepository` is your app is running locally. This allows you to run your app locally as well as in the cloud without having to configure anything differently. However, you must install Redis on your local machine, if you want to test your app with a local Redis server. 
+With this latest code you can still experiment locally, since your app uses a simple default `ProductRepository` instead of the Redis-based repository in case your Redis service binding cannot be found. This allows you to run your app locally as well as in the cloud without having to configure anything differently. However, you must install Redis on your local machine, if you want to test your app with a local Redis server. 
 
 Now compile/build your changes and push them to the cloud:
 
