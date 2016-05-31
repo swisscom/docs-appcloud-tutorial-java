@@ -212,7 +212,7 @@ Now compile/build your changes and push them to the cloud:
 
 <pre class="terminal">
 $ gralde build
-$ cf push my-java-app -b java_buildpack -p build/libs/cf-sample-app-java-1.0.jar
+$ cf push my-java-app -b java_buildpack -p target/build/libs/cf-sample-app-java-1.0.jar
 </pre>
 
 You can access other services like MongoDB or MariaDB in a similar matter, simply by binding them to your app and accessing them through the environment variables.
