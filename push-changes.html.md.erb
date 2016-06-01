@@ -16,7 +16,7 @@ $ gradle build
 
 ...
 
-$ java -jar target/build/libs/cf-sample-app-java-1.0.jar
+$ java -jar build/libs/cf-sample-app-java-1.0.jar
 </pre>
 
 Visiting your application at <a href="http://localhost:4567" target="_blank">http://localhost:4567</a>, you should receive the following response:
@@ -32,7 +32,7 @@ Visiting your application at <a href="http://localhost:4567" target="_blank">htt
 Since you already have compiled and built your latest changes, you only need to push your changes to the app cloud. All you need to do is to execute `cf push` again:
 
 <pre class="terminal">
-$ cf push my-java-app -p target/build/libs/cf-sample-app-java-1.0.jar
+$ cf push my-java-app -p build/libs/cf-sample-app-java-1.0.jar
 </pre>
 
 Finally, check that everything is working by visiting your app's URL from your web browser.
