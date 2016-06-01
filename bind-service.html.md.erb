@@ -169,7 +169,7 @@ public static class RedisProductRepository {
 }
 ```
 
-With this latest code you can still experiment locally, since your app uses a simple default `ProductRepository` instead of the Redis-based repository in case your Redis service binding cannot be found. This allows you to run your app locally as well as in the cloud without having to configure anything differently. However, you must install <a href="http://redis.io/topics/quickstart" target="_blank">Redis</a> on your local machine, if you want to test your app with a local Redis server.
+With this latest code you can still experiment locally, since your app uses the `SimpleProductRepository` instead of the `RedisProductRepository` in case your Redis service binding cannot be found. This allows you to run your app locally as well as in the cloud without having to configure anything differently. However, you must install <a href="http://redis.io/topics/quickstart" target="_blank">Redis</a> on your local machine, if you want to test your app with a local Redis server.
 
 Now compile/build your changes and push them to the cloud:
 
