@@ -80,7 +80,7 @@ Now you want to consume your new Redis datastore from within your application. I
 compile 'redis.clients:jedis:2.6.2'
 ```
 
-Now adjust the existing `ProductService` class in `src/main/.../ProductService.java` to setup a Redis-based `ProductRepository`. 
+Now adjust the existing `ProductService` class in `src/main/.../ProductService.java` to setup a Redis-based `ProductRepository` implementation. 
 
 Adjust the existing `getProductRepository` method in the `ProductService` class as listed below. This method ensures that a Redis-based repository is created when the Redis service binding can be found. 
 
@@ -120,15 +120,15 @@ private static Map<String,Object> getRedisCredentials(String servicesJson) {
 }
 ```
 
-Now adjust the existing `ProductRepository` class (a static inner class of `ProductServce` class) to store and retrieve products via Redis datastore:
+Now add the new `RedisProductRepository` class as static inner class of `ProductServce` class to store and retrieve products via Redis datastore:
 
 ```java
-public static class ProductRepository {
+public static class RedisProductRepository {
 
   private Jedis jedis;
   private ObjectMapper mapper;
 
-  public ProductRepository(Map<String,Object> redisCredentials) {
+  public RedisProductRepository(Map<String,Object> redisCredentials) {
     jedis = new Jedis((String) redisCredentials.get("host"), (int) redisCredentials.get("port"));
     jedis.auth((String) redisCredentials.get("password"));
     mapper = new ObjectMapper();
