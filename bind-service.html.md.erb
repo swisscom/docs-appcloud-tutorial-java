@@ -74,15 +74,15 @@ Restaging app my-java-app in MyOrg monitor / space MySpace as user@mydomain.com.
 ...
 </pre>
 
-Now you want to consume your new Redis datastore from within your application. In order to do that, you have to adjust the code to store and retrieve data via Redis. But first you have to add the <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> dependency to the "dependencies" section of your `build.gradle` file. Jedis is a Java Redis client that lets your app interact with the Redis server.
+Now you want to consume your new Redis datastore from within your application. In order to do that, you have to adjust the code to store and retrieve data via Redis. But first you have to add the <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> dependency to the `dependencies` section of your `build.gradle` file. Jedis is a Java Redis client that lets your app interact with the Redis server.
 
 ```gradle
 compile 'redis.clients:jedis:2.6.2'
 ```
 
-Now adjust the existing `ProductService` class in `src/main/.../ProductService.java` to setup a Redis-based `ProductRepository` implementation. 
+Now adjust the existing `ProductService` class in `src/main/.../ProductService.java` to setup a Redis-based `ProductRepository` implementation.
 
-Adjust the existing `getProductRepository` method in the `ProductService` class as listed below. This method ensures that a Redis-based repository is created when the Redis service binding can be found. 
+Adjust the existing `getProductRepository` method in the `ProductService` class as listed below. This method ensures that a Redis-based repository is created when the Redis service binding can be found.
 
 ```java
 private static ProductRepository getProductRepository() {
@@ -97,7 +97,7 @@ private static ProductRepository getProductRepository() {
 }
 ```
 
-Add the new `getRedisCredentials` method below to the `ProductService` class. This method reads and parses the Redis credentials from the environment variables.
+Add the `getRedisCredentials` method below as a new method to the `ProductService` class. This method reads and parses the Redis credentials from the environment variables.
 
 ```java
 @SuppressWarnings("unchecked")
@@ -120,7 +120,7 @@ private static Map<String,Object> getRedisCredentials(String servicesJson) {
 }
 ```
 
-Now add the new `RedisProductRepository` as static inner class of `ProductServce` class to store and retrieve products via Redis datastore:
+Now add the new `RedisProductRepository` below as static inner class of `ProductServce` class to store and retrieve products via Redis datastore:
 
 ```java
 public static class RedisProductRepository {
