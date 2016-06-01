@@ -76,11 +76,13 @@ Restaging app my-java-app in MyOrg monitor / space MySpace as user@mydomain.com.
 
 Now you want to consume your new Redis datastore from within your application. In order to do that, you have to adjust the code to store and retrieve data via Redis. But first you have to add the <a href="https://github.com/xetorthio/jedis" target="_blank">Jedis</a> dependency to the "dependencies" section of your `build.gradle` file. Jedis is a Java Redis client that lets your app interact with the Redis server.
 
-```java
+```gradle
 compile 'redis.clients:jedis:2.6.2'
 ```
 
-Now adjust the existing `ProductService` in `src/main/.../ProductService.java` to setup a Redis-based `ProductRepository`:
+Now adjust the existing `ProductService` in `src/main/.../ProductService.java` to setup a Redis-based `ProductRepository`. 
+
+Adjust the existing `getProductRepository` method in the `ProductService` class as follows. This ensures that a Redis-based repository is created when the Redis service binding can be found. 
 
 ```java
 private static ProductRepository getProductRepository() {
@@ -94,6 +96,8 @@ private static ProductRepository getProductRepository() {
     }
 }
 ```
+
+Add the `getRedisCredentials` method below to the `ProductService` class. This methods reads and parses the Redis credentials from the environment variables.
 
 ```java
 @SuppressWarnings("unchecked")
@@ -116,9 +120,7 @@ private static Map<String,Object> getRedisCredentials(String servicesJson) {
 }
 ```
 
-The code snippet above ensures that your app reads the credentials of your Redis service from the environment variables in order to setup the `ProductRepository`.
-
-Now adjust the existing `ProductRepository` (a static inner class of `ProductServce`) to store and retrieve products via Redis datastore:
+Now adjust the existing `ProductRepository` class (a static inner class of `ProductServce` class) to store and retrieve products via Redis datastore:
 
 ```java
 public static class ProductRepository {
@@ -173,7 +175,7 @@ Now compile/build your changes and push them to the cloud:
 
 <pre class="terminal">
 $ gradle build
-$ cf push my-java-app -p target/build/libs/cf-sample-app-java-1.0.jar
+$ cf push my-java-app -p build/libs/cf-sample-app-java-1.0.jar
 </pre>
 
 You can access other services like MongoDB or MariaDB in a similar matter, simply by binding them to your app and accessing them through the environment variables.
