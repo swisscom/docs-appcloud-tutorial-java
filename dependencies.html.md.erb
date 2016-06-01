@@ -12,9 +12,8 @@ The dependencies needed for the application are also declared in the `build.grad
 The `build.gradle` file of your deployed sample app looks something like this:
 
 
-```java
+```gradle
 apply plugin: 'java'
-apply plugin: 'eclipse'
 
 sourceCompatibility = 1.8
 version = '1.0'
@@ -40,9 +39,6 @@ repositories {
 dependencies {
     compile 'com.sparkjava:spark-core:2.2'
     compile 'com.fasterxml.jackson.core:jackson-databind:2.6.2'
-    compile 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.6.2'
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.mockito:mockito-core:1.10.19'
 }
 
 ...
