@@ -175,12 +175,10 @@ Now compile/build your changes and push them to the cloud:
 
 <pre class="terminal">
 $ gradle build
-$ cf push my-java-app -p build/libs/cf-sample-app-java-1.0.jar
+$ cf push my-java-app -p build/libs/cf-sample-app-java-1.0.0.jar
 </pre>
 
 You can access other services like MongoDB or MariaDB in a similar matter, simply by binding them to your app and accessing them through the environment variables.
-
-You can checkout the finished version of all these changes in the `advanced` branch of the sample app repository on <a href="https://github.com/swisscom/cf-sample-app-java/tree/advanced" target="_blank">Github</a>.
 
 <div style="text-align:center;padding:3em;">
   <a href="./manifest.html" class="btn btn-primary">I've bound a service to my App</a>
