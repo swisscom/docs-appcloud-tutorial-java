@@ -31,14 +31,14 @@ BUILD SUCCESSFUL
 Total time: 6.78 secs
 </pre>
 
-Gradle will build a Java archive (JAR) file of your app. It is located under `build/libs/cf-sample-app-java-1.0.jar`. The Java archive contains all dependencies needed by your app.
+Gradle will build a Java archive (JAR) file of your app. It is located under `build/libs/cf-sample-app-java-1.0.0.jar`. The Java archive contains all dependencies needed by your app.
 
 Push your app to the cloud by executing the following command and replacing the "my-random-hostname" with your own hostname. This will be part of the URL your app will be reached at and it has to be globally unique so be creative.
 
-The `-p build/libs/cf-sample-app-java-1.0.jar` tells Cloud Foundry where to find the compiled application to push to the Cloud.
+The `-p build/libs/cf-sample-app-java-1.0.0.jar` tells Cloud Foundry where to find the compiled application to push to the Cloud.
 
 <pre class="terminal">
-$ cf push my-java-app -p buld/libs/cf-sample-app-java-1.0.jar -n my-random-hostname
+$ cf push my-java-app -p build/libs/cf-sample-app-java-1.0.0.jar -n my-random-hostname
 Creating app my-java-app in org MyOrg / space MySpace as user@mydomain.com...
 OK
 
