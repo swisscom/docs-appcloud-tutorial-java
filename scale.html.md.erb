@@ -5,7 +5,7 @@ owner: Daniel Freitag
 
 <strong><%= modified_date %></strong>
 
-Currently, your app is running as a single instance with 1GB of memory.
+Currently, your app is running as a single instance with 1 GB of memory.
 
 You can check how many instances are running and how much memory they have using the `cf scale` command:
 
@@ -33,7 +33,7 @@ OK
 
 ## Scaling Vertically
 
-Scaling an application vertically on <%= vars.product_full %> is equivalent to changing the amount of memory each instance has. Scale the amount of memory to 2G:
+Scaling an application vertically on <%= vars.product_full %> is equivalent to changing the amount of memory each instance has. Scale the amount of memory to 2 GB:
 
 <pre class="terminal">
 $ cf scale my-java-app -m 2G
@@ -51,7 +51,7 @@ OK
 #2   running   2016-05-29 03:38:11 PM   0.1%    326M of 2G   132.2M of 1G
 </pre>
 
-The last statement shows a summary of the three instances with a memory cap of 2G each that we now have.
+The last statement shows a summary of the three instances with a memory cap of 2 GB each that we now have.
 
 <div style="text-align:center;margin:3em;">
   <a href="./dependencies.html" class="btn btn-primary">I know how to scale my App</a>
