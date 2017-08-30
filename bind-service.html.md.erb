@@ -82,17 +82,24 @@ compile 'redis.clients:jedis:2.6.2'
 
 Now adjust the existing `ProductService` class in `src/main/.../ProductService.java` to setup a Redis-based `ProductRepository` implementation.
 
+
+Add Jedis as a dependency import to the top of the file:
+
+```java
+import redis.clients.jedis.Jedis;
+```
+
 Adjust the existing `getProductRepository` method in the `ProductService` class as listed below. This method ensures that a Redis-based repository is created when the Redis service binding can be found.
 
 ```java
 private static ProductRepository getProductRepository() {
-	ProcessBuilder processBuilder = new ProcessBuilder();
+        ProcessBuilder processBuilder = new ProcessBuilder();
     String servicesJson = processBuilder.environment().get("VCAP_SERVICES");
     if (servicesJson != null) {
-    	Map<String,Object> redisCredentials = getRedisCredentials(servicesJson);
-     	return new RedisProductRepository(redisCredentials);
+        Map<String,Object> redisCredentials = getRedisCredentials(servicesJson);
+        return new RedisProductRepository(redisCredentials);
     } else {
-    	return new SimpleProductRepository();
+        return new SimpleProductRepository();
     }
 }
 ```
@@ -123,7 +130,7 @@ private static Map<String,Object> getRedisCredentials(String servicesJson) {
 Now add the new `RedisProductRepository` below as static inner class of `ProductService` class to store and retrieve products via Redis datastore:
 
 ```java
-public static class RedisProductRepository {
+public static class RedisProductRepository implements ProductRepository {
 
   private Jedis jedis;
   private ObjectMapper mapper;
