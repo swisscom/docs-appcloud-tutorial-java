@@ -33,7 +33,7 @@ Total time: 6.78 secs
 
 Gradle will build a Java archive (JAR) file of your app. It is located under `build/libs/cf-sample-app-java-1.0.0.jar`. The Java archive contains all dependencies needed by your app.
 
-Replace "my-random-hostname" with your own hostname and "scapp.io" with an available shared domain (`cf domains` or "Domains" in the portal under your Organization) or your own domain. This is the URL your app will be reached at and therefore has to be unique in this Application Cloud.
+Replace "my-random-hostname" with your own hostname and "scapp.io" with an available shared domain (`cf domains` or "Domains" in the portal under your organization) or your own domain. This is the URL your app will be reached at and therefore has to be unique in this Application Cloud.
 
 Now push your app to the cloud by executing the following command:
 
@@ -65,7 +65,7 @@ stack: unknown
 buildpack: java_buildpack
 </pre>
 
-The `-p build/libs/cf-sample-app-java-1.0.0.jar` tells Cloud Foundry where to find the compiled application to push to the Cloud.
+The `-p build/libs/cf-sample-app-java-1.0.0.jar` tells Cloud Foundry where to find the compiled application to push to the cloud.
 
 The application is now deployed. Ensure that the app is running:
 
