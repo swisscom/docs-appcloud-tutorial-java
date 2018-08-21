@@ -33,19 +33,19 @@ Total time: 6.78 secs
 
 Gradle will build a Java archive (JAR) file of your app. It is located under `build/libs/cf-sample-app-java-1.0.0.jar`. The Java archive contains all dependencies needed by your app.
 
-Push your app to the cloud by executing the following command and replacing the "my-random-hostname" with your own hostname. This will be part of the URL your app will be reached at and it has to be globally unique so be creative.
+Replace "my-random-hostname" with your own hostname and "scapp.io" with an available shared domain (`cf domains` or "Domains" in the portal under your organization) or your own domain. This is the URL your app will be reached at and therefore has to be unique in this Application Cloud.
 
-The `-p build/libs/cf-sample-app-java-1.0.0.jar` tells Cloud Foundry where to find the compiled application to push to the Cloud.
+Now push your app to the cloud by executing the following command:
 
 <pre class="terminal">
-$ cf push my-java-app -p build/libs/cf-sample-app-java-1.0.0.jar -n my-random-hostname
+$ cf push my-java-app -p build/libs/cf-sample-app-java-1.0.0.jar -n my-random-hostname -d mydomain.com
 Creating app my-java-app in org MyOrg / space MySpace as user@mydomain.com...
 OK
 
-Creating route my-random-hostname.scapp.io...
+Creating route my-random-hostname.mydomain.com...
 OK
 
-Binding my-random-hostname.scapp.io to my-java-app...
+Binding my-random-hostname.mydomain.com to my-java-app...
 OK
 
 Uploading my-java-app...
@@ -59,11 +59,13 @@ OK
 requested state: started
 instances: 1/1
 usage: 1G x 1 instances
-urls: my-random-hostname.scapp.io
+urls: my-random-hostname.mydomain.com
 last uploaded: Sun May 29 15:22:58 UTC 2016
 stack: unknown
 buildpack: java_buildpack
 </pre>
+
+The `-p build/libs/cf-sample-app-java-1.0.0.jar` tells Cloud Foundry where to find the compiled application to push to the cloud.
 
 The application is now deployed. Ensure that the app is running:
 
@@ -75,7 +77,7 @@ OK
 requested state: started
 instances: 1/1
 usage: 1G x 1 instances
-urls: my-random-hostname.scapp.io
+urls: my-random-hostname.mydomain.com
 last uploaded: Sun May 29 15:22:58 UTC 2016
 stack: cflinuxfs2
 buildpack: java_buildpack
